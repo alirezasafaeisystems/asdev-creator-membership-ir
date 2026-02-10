@@ -6,11 +6,11 @@
   "scripts": {
     "docs:validate": "node tools/docs-validator/validate.js",
     "phase:run": "bash tools/phase-runner/run.sh",
-    "lint": "bash -n tools/phase-runner/run.sh ops/scripts/backup_db.sh ops/scripts/restore_db.sh",
-    "typecheck": "node -e \"console.log('TYPECHECK_NA_OK: no TS sources yet')\"",
-    "test:unit": "node -e \"const fs=require('fs'); const req=['docs/DEVELOPMENT/03_Test_Strategy.md','docs/ARCHITECTURE/03_API_Standards.md']; for (const f of req){if(!fs.existsSync(f)){console.error('MISSING',f);process.exit(1)}} console.log('UNIT_DOC_GATES_OK')\"",
-    "test:integration": "node -e \"const p=require('./tools/phase-runner/phases.json'); if(!Array.isArray(p.phases)||p.phases.length===0){process.exit(1)}; console.log('PHASES_SCHEMA_OK')\"",
-    "test:e2e": "node -e \"const fs=require('fs'); const req=['docs/RUNBOOKS/Payment_Issues.md','docs/RUNBOOKS/Security_Incident.md']; for (const f of req){if(!fs.existsSync(f)){console.error('MISSING',f);process.exit(1)}} console.log('RUNBOOK_GATES_OK')\"",
+    "lint": "node tools/quality-lint.js",
+    "typecheck": "node tools/quality-typecheck.js",
+    "test:unit": "node tools/quality-unit.js",
+    "test:integration": "node tools/quality-integration.js",
+    "test:e2e": "node tools/quality-e2e.js",
     "security:scan": "bash -lc 'if rg -n \"(ghp_[A-Za-z0-9]{20,}|sk_live_[A-Za-z0-9]+|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16})\" -S . --glob \"!**/.git/**\" --glob \"!**/node_modules/**\"; then echo SECRET_PATTERN_DETECTED; exit 1; else echo SECURITY_SCAN_OK; fi' && node tools/security/validate-sensitive-policies.js"
   }
 }
