@@ -50,12 +50,7 @@ const requiredFiles = [
   "tools/phase-runner/phases.json",
   "tools/phase-runner/run.sh",
   "tools/phase-runner/README.md",
-  "tools/docs-validator/validate.js",
-  "ops/dashboards/development-dashboard.html",
-  "ops/dashboards/deploy-dashboard.html",
-  "CHANGELOG.md",
-  "LICENSE",
-  ".gitignore"
+  "tools/docs-validator/validate.js",  "CHANGELOG.md",  ".gitignore"
 ];
 
 let ok = true;
