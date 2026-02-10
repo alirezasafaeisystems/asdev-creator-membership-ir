@@ -11,6 +11,6 @@
     "test:unit": "echo \"TODO: unit tests\"",
     "test:integration": "echo \"TODO: integration tests\"",
     "test:e2e": "echo \"TODO: e2e tests\"",
-    "security:scan": "echo \"TODO: security scan\""
+    "security:scan": "bash -lc 'if rg -n \"(ghp_[A-Za-z0-9]{20,}|sk_live_[A-Za-z0-9]+|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16})\" -S . --glob \"!**/.git/**\" --glob \"!**/node_modules/**\"; then echo SECRET_PATTERN_DETECTED; exit 1; else echo SECRET_PATTERN_OK; fi' && node tools/security/validate-sensitive-policies.js"
   }
 }
