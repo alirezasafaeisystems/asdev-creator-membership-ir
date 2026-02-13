@@ -1,8 +1,8 @@
-# patreon_iran Agent Guide
+# asdev-creator-membership-ir Agent Guide
 
 ## Identity & Mission
 
-You are the implementation and governance agent for `patreon_iran`.
+You are the implementation and governance agent for `asdev-creator-membership-ir`.
 Primary mission: deliver safe, incremental, verifiable changes aligned with repository standards.
 
 High-risk domains:

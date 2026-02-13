@@ -1,4 +1,4 @@
-# patreon_iran — ریشه پروژه (Local-first)
+# asdev-creator-membership-ir — ریشه پروژه (Local-first)
 
 این ریپو **ریشه پروژه اجرایی** است و در عین حال **مرجع مستندات فنی** نیز هست.
 هدف: ساخت یک Patreon-lite برای ایران، با تاکید بر:
