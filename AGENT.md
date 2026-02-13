@@ -13,11 +13,8 @@ High-risk domains:
 ## Repo Commands
 
 - Setup: `pnpm install --frozen-lockfile`
-- Run: `n/a`
 - Test: `pnpm run test:unit`
 - Lint: `pnpm run lint`
-- Format: `n/a`
-- Build: `n/a`
 - Typecheck: `pnpm run typecheck`
 - Security: `pnpm run security:scan`
 
@@ -44,12 +41,11 @@ High-risk domains:
 
 ## Quality Checklist
 
-- Execute available lint/test/build/typecheck/security commands listed above.
+- Execute lint/test/typecheck/security commands.
 - Keep CI workflows passing.
 - Record command evidence in PR.
 
 CI workflows detected:
-- `.github/workflows/asdev-quality-gate.yml`
 - `.github/workflows/ci.yml`
 - `.github/workflows/js-ts-level1.yml`
 
@@ -63,9 +59,3 @@ CI workflows detected:
 - Risk/Auditability
 - Abuse/Fraud resistance
 - Payment Integrity
-
-## Documentation & Change Log Expectations
-
-- Update repository docs for behavior or policy changes.
-- Update changelog/release notes for user-visible changes.
-- Include verification commands and outcomes in PR summary.
