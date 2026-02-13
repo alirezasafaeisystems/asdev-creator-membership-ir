@@ -1,4 +1,9 @@
 # Module: memberships
-نسخه: 0.1
+نسخه: 0.2
 
-(Placeholder)
+## مسئولیت
+ایجاد/تمدید/انقضای عضویت بر مبنای پرداخت موفق.
+
+## قواعد
+- duplicate active membership ممنوع
+- membership فقط بعد از payment succeeded فعال می شود

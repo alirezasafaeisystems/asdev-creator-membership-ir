@@ -1,0 +1,11 @@
+{
+  "phaseId": "RELEASE",
+  "phaseName": "Release Snapshot & Verification",
+  "createdAt": "2026-02-13T22:10:12Z",
+  "git": { "branch": "codex/phase-all-20260213-224706", "commit": "8d12e6e2c0b66aa18a49e27b55e76852c6b50245", "tag": "phase-RELEASE-20260213-221012" },
+  "gates": [{"id":"docs_validate","ok":true,"cmd":"node tools/docs-validator/validate.js","duration_ms":21}],
+  "artifacts": [
+    { "name": "manifest", "path": "snapshots/RELEASE/manifest.json" },
+    { "name": "phase_report", "path": "snapshots/RELEASE/report.md" }
+  ]
+}

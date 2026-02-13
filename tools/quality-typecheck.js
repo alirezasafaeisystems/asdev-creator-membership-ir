@@ -62,10 +62,28 @@ for (const phase of phasesData.phases) {
 }
 
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-for (const key of ['lint', 'typecheck', 'test:unit', 'test:integration', 'test:e2e']) {
+for (const key of ['lint', 'typecheck', 'test:unit', 'test:integration', 'test:e2e', 'docs:validate']) {
   const script = pkg.scripts?.[key];
   if (!script || typeof script !== 'string') fail(`TYPECHECK_FAIL: package.json scripts.${key} missing`);
   if (/TODO/i.test(script)) fail(`TYPECHECK_FAIL: package.json scripts.${key} still contains TODO`);
+}
+
+const criticalDocs = [
+  'docs/GOVERNANCE.md',
+  'docs/CODE_OWNERSHIP.md',
+  'docs/CONTRIBUTING.md',
+  'docs/POLICIES/DATA_POLICY.md',
+  'docs/POLICIES/DEPENDENCY_POLICY.md',
+  'docs/POLICIES/BRANCH_RELEASE_POLICY.md',
+  'docs/DEVELOPMENT/Definition_of_Done.md',
+];
+for (const doc of criticalDocs) {
+  const abs = path.join(root, doc);
+  if (!fs.existsSync(abs)) fail(`TYPECHECK_FAIL: missing critical doc ${doc}`);
+  const content = fs.readFileSync(abs, 'utf8');
+  if (/\(Placeholder\)/i.test(content)) {
+    fail(`TYPECHECK_FAIL: placeholder remains in critical doc ${doc}`);
+  }
 }
 
 console.log(`QUALITY_TYPECHECK_OK phases=${phasesData.phases.length}`);

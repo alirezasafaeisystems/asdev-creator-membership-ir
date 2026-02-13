@@ -1,6 +1,6 @@
 # Phase Runner
-نسخه: 1.0
-تاریخ: 2026-02-08
+نسخه: 1.1
+تاریخ: 2026-02-13
 
 ## اجرا
 ```bash
@@ -11,3 +11,10 @@ node tools/docs-validator/validate.js
 ## خروجی
 - `snapshots/<PHASE>/manifest.json`
 - `snapshots/<PHASE>/report.md`
+
+## رفتار commit/tag/push
+- در حالت پیش فرض push خاموش است.
+- برای push خودکار branch/tag:
+```bash
+PHASE_RUNNER_PUSH=1 ./tools/phase-runner/run.sh P0
+```

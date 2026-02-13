@@ -1,15 +1,24 @@
 # پرداخت/تسویه/ممیزی
-نسخه: 1.1
+نسخه: 1.2
 
-## پرداخت (Payment)
-- تمام callbackهای payment gateway باید idempotent باشند.
-- `gatewayRef` باید یکتا باشد تا از دوباره‌پردازش جلوگیری شود.
-- رخدادهای webhook قبل از اعمال وضعیت، ثبت ممیزی شوند.
+## Payment Flow
+- `payments/create`: ایجاد intent با amount و gateway
+- `payments/callback`: پردازش idempotent با `gatewayRef` یکتا
+- قبل از تغییر status، `payment_events` باید ذخیره شوند.
 
-## تسویه (Payout)
-- هر payout باید به payment معتبر و وضعیت تسویه‌شده متصل باشد.
-- عملیات payout شامل approval و ثبت actor مدیریتی است.
+## Idempotency Rules
+- callback تکراری نباید membership یا ledger را دوباره تغییر دهد.
+- replay callback باید `PAYMENT_CALLBACK_REPLAY` ثبت کند.
 
-## ممیزی (Audit)
-- برای payment و payout باید trail شامل `who/when/what` نگهداری شود.
-- رخدادهای بحرانی (refund/dispute/manual override) نیازمند log و بازبینی هستند.
+## Payout Flow
+- فقط paymentهای `succeeded` و settled وارد payout می شوند.
+- `payout_items.paymentId` باید unique باشد.
+- approval payout باید actor ادمین و timestamp داشته باشد.
+
+## Audit
+- برای payment/payout/admin action، trail شامل `who/when/what/why` ذخیره شود.
+- رخدادهای بحرانی: `refund`, `dispute`, `manual_override`, `permission_change`
+
+## Reconciliation
+- گزارش روزانه ناهماهنگی payment/payout
+- هر mismatch باید incident یا ticket عملیاتی تولید کند.

@@ -1,25 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 PHASE_ID="${1:-}"
 if [[ -z "$PHASE_ID" ]]; then
   echo "Usage: ./tools/phase-runner/run.sh <PHASE_ID>"
   exit 1
 fi
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PHASES_JSON="$ROOT_DIR/tools/phase-runner/phases.json"
 SNAP_DIR="$ROOT_DIR/snapshots/$PHASE_ID"
 MANIFEST="$SNAP_DIR/manifest.json"
 REPORT="$SNAP_DIR/report.md"
+PUSH_ENABLED="${PHASE_RUNNER_PUSH:-0}"
 
 cd "$ROOT_DIR"
 mkdir -p "$SNAP_DIR"
 
 phase_json="$(node - "$PHASE_ID" "$PHASES_JSON" <<'NODE'
-const fs = require("fs");
+const fs = require('fs');
 const phaseId = process.argv[2];
 const phasesPath = process.argv[3];
-const parsed = JSON.parse(fs.readFileSync(phasesPath,"utf8"));
-const phase = (parsed.phases||[]).find(p=>p.id===phaseId);
+const parsed = JSON.parse(fs.readFileSync(phasesPath, 'utf8'));
+const phase = (parsed.phases || []).find((p) => p.id === phaseId);
 if (!phase) process.exit(2);
 process.stdout.write(JSON.stringify(phase));
 NODE
@@ -40,22 +43,25 @@ created_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 gates="$(node -e 'const p=JSON.parse(process.argv[1]);console.log(JSON.stringify(p.gates||[]))' "$phase_json")"
 
 node - "$gates" <<'NODE' > "$SNAP_DIR/_gate_results.json"
-const {execSync} = require("child_process");
+const { execSync } = require('child_process');
 const gates = JSON.parse(process.argv[2]);
 let results = [];
 let overallOk = true;
 for (const g of gates) {
   const start = Date.now();
   let ok = true;
-  try { execSync(g.cmd, {stdio:"pipe"}); }
-  catch { ok = false; overallOk = false; }
-  results.push({id:g.id, ok, cmd:g.cmd, duration_ms: Date.now()-start});
+  try {
+    execSync(g.cmd, { stdio: 'pipe' });
+  } catch {
+    ok = false;
+    overallOk = false;
+  }
+  results.push({ id: g.id, ok, cmd: g.cmd, duration_ms: Date.now() - start });
 }
-process.stdout.write(JSON.stringify({overallOk, results}, null, 2));
+process.stdout.write(JSON.stringify({ overallOk, results }, null, 2));
 NODE
 
 overall_ok="$(node -e "console.log(require('./snapshots/'+process.argv[1]+'/_gate_results.json').overallOk ? 1 : 0)" "$PHASE_ID" 2>/dev/null || echo 0)"
-# read gate results from file directly
 gate_results="$(cat "$SNAP_DIR/_gate_results.json" | node -e "const s=require('fs').readFileSync(0,'utf8');console.log(JSON.stringify(JSON.parse(s).results))")"
 
 cat > "$MANIFEST" <<JSON
@@ -99,8 +105,14 @@ fi
 git add "$SNAP_DIR"
 git commit -m "chore(phase): complete ${PHASE_ID} snapshot"
 git tag "$TAG"
-if git remote get-url origin >/dev/null 2>&1; then
-  git push origin "$GIT_BRANCH"
-  git push origin "$TAG"
+
+if [[ "$PUSH_ENABLED" == "1" ]]; then
+  if git remote get-url origin >/dev/null 2>&1; then
+    git push origin "$GIT_BRANCH"
+    git push origin "$TAG"
+  fi
+else
+  echo "INFO: Push disabled. Set PHASE_RUNNER_PUSH=1 to push branch/tag."
 fi
+
 echo "DONE: $PHASE_ID"

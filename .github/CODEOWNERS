@@ -1,1 +1,15 @@
+# Global fallback
 * @project-owner @tech-lead
+
+# Domain ownership
+/apps/api/ @backend-lead @tech-lead
+/apps/web/ @frontend-lead @tech-lead
+/modules/identity/ @security-lead @backend-lead
+/modules/payments/ @finance-lead @backend-lead
+/modules/payouts/ @finance-lead @tech-lead
+/modules/assets/ @backend-lead @security-lead
+/modules/audit/ @security-lead @tech-lead
+/modules/admin/ @backend-lead @ops-lead
+/tools/ @tech-lead @ops-lead
+/ops/ @ops-lead @tech-lead
+/docs/ @tech-lead @project-owner

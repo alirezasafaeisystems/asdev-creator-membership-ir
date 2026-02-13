@@ -1,10 +1,8 @@
-.editorconfig
-.env.example
-.github/CODEOWNERS
-.github/pull_request_template.md
-.github/workflows/ci.yml
-.gitignore
+AGENT.md
+AGENTS.md
 CHANGELOG.md
+CONTRIBUTING.md
+FINAL_FILE_INVENTORY.txt
 README.md
 apps/api/README.md
 apps/web/README.md
@@ -61,6 +59,8 @@ modules/memberships/README.md
 modules/payments/README.md
 modules/payouts/README.md
 ops/compose.local.yml
+ops/dashboards/deploy-dashboard.html
+ops/dashboards/development-dashboard.html
 ops/nginx/nginx.local.conf
 ops/scripts/backup_db.sh
 ops/scripts/restore_db.sh
@@ -75,3 +75,9 @@ tools/docs-validator/validate.js
 tools/phase-runner/README.md
 tools/phase-runner/phases.json
 tools/phase-runner/run.sh
+tools/quality-e2e.js
+tools/quality-integration.js
+tools/quality-lint.js
+tools/quality-typecheck.js
+tools/quality-unit.js
+tools/security/validate-sensitive-policies.js

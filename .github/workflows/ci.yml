@@ -2,9 +2,9 @@ name: CI (Strict / Local-first)
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -17,88 +17,43 @@ jobs:
   quality-gates:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: pli
-          POSTGRES_PASSWORD: pli
-          POSTGRES_DB: pli
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U pli"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-      minio:
-        image: minio/minio:RELEASE.2024-12-18T18-04-18Z
-        env:
-          MINIO_ROOT_USER: minio
-          MINIO_ROOT_PASSWORD: minio123456
-        ports:
-          - 9000:9000
-        options: >-
-          --health-cmd="curl -f http://localhost:9000/minio/health/live || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        command: server /data
-
     steps:
-      # --- Checkout ---
       - name: Checkout
         uses: actions/checkout@v4
 
-      # --- Node / PNPM ---
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile || pnpm install
+        run: pnpm install --frozen-lockfile || pnpm install
 
-      # --- Docs Gate (HARD) ---
       - name: Docs validation (required)
         run: pnpm -w docs:validate
 
-      # --- Lint (placeholder but enforced) ---
       - name: Lint
         run: pnpm -w lint
 
-      # --- Typecheck ---
       - name: Typecheck
         run: pnpm -w typecheck
 
-      # --- Tests ---
       - name: Unit tests
         run: pnpm -w test:unit
 
-      - name: Integration tests (DB + MinIO)
-        env:
-          DATABASE_URL: postgresql://pli:pli@localhost:5432/pli
-          MINIO_ENDPOINT: http://localhost:9000
-          MINIO_ACCESS_KEY: minio
-          MINIO_SECRET_KEY: minio123456
+      - name: Integration tests
         run: pnpm -w test:integration
 
       - name: E2E tests
         run: pnpm -w test:e2e
 
-      # --- Security gate ---
       - name: Security scan
         run: pnpm -w security:scan
 
-      # --- Phase consistency check (optional, informational) ---
       - name: Phase runner dry check
         run: |
-          echo "Phase runner present:"
-          ls -l tools/phase-runner/run.sh
-
+          bash -n tools/phase-runner/run.sh
+          test -f tools/phase-runner/phases.json

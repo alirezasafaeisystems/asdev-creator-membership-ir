@@ -1,15 +1,27 @@
 # Observability & SRE
-نسخه: 1.1
+نسخه: 1.2
 
 ## Telemetry اصولی
-- telemetry فقط برای شاخص‌های عملیاتی/کیفی ضروری جمع‌آوری شود.
-- analytics باید با کمینه‌سازی داده و بدون اطلاعات حساس انجام شود.
+- telemetry فقط برای شاخص های عملیاتی ضروری جمع آوری شود.
+- analytics باید با کمینه سازی داده و بدون اطلاعات حساس انجام شود.
 
-## خطا و هشدار
-- خطاهای auth/payment/payout باید با severity مشخص log شوند.
-- برای خطاهای مکرر callback یا ناهماهنگی payment/payout هشدار خودکار تعریف شود.
+## Metrics پایه
+- payment callback success rate
+- payment callback replay rate
+- asset download deny rate
+- payout processing latency
+- 5xx rate برای endpointهای حساس
 
-## SLO پایه
-- موفقیت پردازش webhook پرداخت
-- زمان پاسخ endpointهای auth و payment
-- نرخ خطای 5xx مسیرهای حساس
+## Logging
+- structured logs با `correlation_id`, `actor_id`, `route`, `error_code`
+- mask داده های حساس در log اجباری است.
+
+## Alerting
+- افزایش خطای callback یا mismatch payment/payout
+- افزایش ناگهانی deny download
+- خطاهای تکراری auth/admin
+
+## SLO اولیه
+- payment callback success >= 99.5%
+- readiness API >= 99.9%
+- p95 latency endpoint حساس < 500ms

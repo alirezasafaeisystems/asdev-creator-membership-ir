@@ -1,4 +1,10 @@
 # Module: payments
-نسخه: 0.1
+نسخه: 0.2
 
-(Placeholder)
+## مسئولیت
+ایجاد پرداخت، پردازش callback، و ثبت payment events.
+
+## قواعد
+- callback idempotent
+- `gatewayRef` یکتا
+- ثبت event قبل از state transition

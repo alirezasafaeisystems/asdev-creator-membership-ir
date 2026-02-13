@@ -1,30 +1,23 @@
-# گزارش هماهنگ‌سازی و ساماندهی مستندات
-نسخه: 1.0
-تاریخ: 2026-02-08
+# گزارش هماهنگ سازی و ساماندهی مستندات
+نسخه: 1.1
+تاریخ: 2026-02-13
 
-## چه چیزهایی اصلاح/هماهنگ شد؟
-1) نسخه‌بندی API:
-- همه endpointها به `/api/v1` استاندارد شدند.
-- بخش Search و Admin Analytics اضافه شد تا با نیازهای جدید (جستجو/تحلیل) همسو باشد.
+## خروجی های هم ترازی این نسخه
+1) هم ترازی Quickstart با فایل های موجود ریپو
+- حذف ارجاع به فایل های ناموجود در `README.md`
+- افزودن مسیر واقعی گیت های کیفیت و رفتار phase runner
 
-2) فازبندی:
-- Sprintهای پراکنده به فازهای P0..P3 + RELEASE نگاشت شدند.
-- Playbook با Phase Runner و dashboards همسو شد.
+2) هم ترازی ایندکس مستندات
+- `docs/INDEX.md` فقط به فایل های واقعی ریپو ارجاع می دهد.
+- مسیر داشبوردها رسمی شد: `ops/dashboards/*`
 
-3) Local-first:
-- ممنوعیت CDN/وابستگی خارجی در runtime به صورت صریح در PRD و سند API/DB/Deploy اضافه شد.
+3) هم ترازی راهبری با CI
+- ارجاع workflowهای موجود به روز شد.
+- policy های branch/release/data/dependency از حالت placeholder خارج شدند.
 
-4) راهبری مستندات:
-- `docs/INDEX.md` به عنوان نقشه رسمی docs تولید شد.
-- `docs/STYLE_GUIDE.md` برای یکدست‌سازی نگارش و ساختار اضافه شد.
+4) هم ترازی اسناد توسعه
+- اسناد Local Dev، Coding Standards، Automation، و DoD قابل اجرا شدند.
 
-## فایل‌های خروجی/بهبود یافته
-- updated/PRD_PatreonLiteIran_v2.2.md
-- updated/API_DB_Deployment_PatreonLiteIran_v2.2.md
-- updated/Engineering_Playbook_PatreonLiteIran_v1.2.md
-- docs/INDEX.md
-- docs/STYLE_GUIDE.md
-- CODEX_INSTRUCTIONS.md
-- CODEX_FILE_PLAN.md
-
-پایان.
+## نکات مهم
+- این ریپو در فاز مستندسازی-اسکلت است و پیاده سازی کامل app هنوز انجام نشده است.
+- برای اجرای تغییرات اجرایی دامنه، ADR و approval gate لازم است.
