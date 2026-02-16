@@ -1,0 +1,59 @@
+name: CI (Strict / Local-first)
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Docs validation (required)
+        run: pnpm -w docs:validate
+
+      - name: Lint
+        run: pnpm -w lint
+
+      - name: Typecheck
+        run: pnpm -w typecheck
+
+      - name: Unit tests
+        run: pnpm -w test:unit
+
+      - name: Integration tests
+        run: pnpm -w test:integration
+
+      - name: E2E tests
+        run: pnpm -w test:e2e
+
+      - name: Security scan
+        run: pnpm -w security:scan
+
+      - name: Phase runner dry check
+        run: |
+          bash -n tools/phase-runner/run.sh
+          test -f tools/phase-runner/phases.json

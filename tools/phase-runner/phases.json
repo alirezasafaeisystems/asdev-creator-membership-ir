@@ -1,0 +1,76 @@
+{
+  "phases": [
+    {
+      "id": "P0",
+      "name": "Foundation & Governance Baseline",
+      "docsToUpdate": [
+        "docs/GOVERNANCE.md"
+      ],
+      "gates": [
+        {
+          "id": "docs_validate",
+          "cmd": "node tools/docs-validator/validate.js"
+        }
+      ],
+      "nextTasksTemplate": "tasks/templates/P0_next.md"
+    },
+    {
+      "id": "P1",
+      "name": "Payments/Membership MVP + Admin Troubleshooting",
+      "docsToUpdate": [
+        "docs/ARCHITECTURE/06_Payments_Payouts_Audit.md"
+      ],
+      "gates": [
+        {
+          "id": "docs_validate",
+          "cmd": "node tools/docs-validator/validate.js"
+        }
+      ],
+      "nextTasksTemplate": "tasks/templates/P1_next.md"
+    },
+    {
+      "id": "P2",
+      "name": "Content Protection + Search + SEO Baseline",
+      "docsToUpdate": [
+        "docs/ARCHITECTURE/05_Content_Protection.md",
+        "docs/ARCHITECTURE/10_Search_Filtering.md"
+      ],
+      "gates": [
+        {
+          "id": "docs_validate",
+          "cmd": "node tools/docs-validator/validate.js"
+        }
+      ],
+      "nextTasksTemplate": "tasks/templates/P2_next.md"
+    },
+    {
+      "id": "P3",
+      "name": "Admin Panel + Payouts + Analytics Dashboard",
+      "docsToUpdate": [
+        "docs/ARCHITECTURE/07_Admin_Panel.md",
+        "docs/ARCHITECTURE/09_Admin_Analytics_Monitoring.md"
+      ],
+      "gates": [
+        {
+          "id": "docs_validate",
+          "cmd": "node tools/docs-validator/validate.js"
+        }
+      ],
+      "nextTasksTemplate": "tasks/templates/P3_next.md"
+    },
+    {
+      "id": "RELEASE",
+      "name": "Release Snapshot & Verification",
+      "docsToUpdate": [
+        "docs/DEPLOYMENT/03_Release_Runbook.md"
+      ],
+      "gates": [
+        {
+          "id": "docs_validate",
+          "cmd": "node tools/docs-validator/validate.js"
+        }
+      ],
+      "nextTasksTemplate": "tasks/templates/RELEASE_next.md"
+    }
+  ]
+}
