@@ -42,3 +42,12 @@
 - `docs/RUNBOOKS/Download_Issues.md`
 - `docs/RUNBOOKS/Payout_Disputes.md`
 - `docs/RUNBOOKS/Security_Incident.md`
+
+## Analysis (Technical Bundle)
+- `docs/ANALYSIS/TECHNICAL_SPEC.md`
+- `docs/ANALYSIS/API_MAP.md`
+- `docs/ANALYSIS/DATABASE_SCHEMA.md`
+- `docs/ANALYSIS/COMPETITIVE_ANALYSIS_IR.md`
+- `docs/ANALYSIS/ROADMAP.md`
+- `docs/ANALYSIS/CODEX_CLI_PROMPT.md`
+- `docs/WIREFRAMES/README.md`

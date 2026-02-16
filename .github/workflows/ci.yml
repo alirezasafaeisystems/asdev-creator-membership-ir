@@ -50,6 +50,9 @@ jobs:
       - name: E2E tests
         run: pnpm -w test:e2e
 
+      - name: Local-first scan (runtime)
+        run: pnpm -w local-first:scan
+
       - name: Security scan
         run: pnpm -w security:scan
 
