@@ -1,11 +1,11 @@
 # گزارش فاز P1 — Payments/Membership MVP + Admin Troubleshooting
-زمان (UTC): 2026-02-16T22:07:01Z
+زمان (UTC): 2026-02-16T22:16:59Z
 
 ## Git
 - branch: `main`
-- commit: `ea0849389d0a7337301cb4f70b72bda6cc5f1cbc`
-- tag: `phase-P1-20260216-220701`
+- commit: `ed7c00e623bcec6954da75eb9305e88066a25ec4`
+- tag: `phase-P1-20260216-221659`
 
 ## Gate Results
-- **docs_validate**: OK — `22` ms — `node tools/docs-validator/validate.js`
-- **local_first**: OK — `22` ms — `node tools/security/verify-local-first.js`
+- **docs_validate**: OK — `23` ms — `node tools/docs-validator/validate.js`
+- **local_first**: OK — `24` ms — `node tools/security/verify-local-first.js`

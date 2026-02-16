@@ -1,9 +1,9 @@
 {
   "phaseId": "P1",
   "phaseName": "Payments/Membership MVP + Admin Troubleshooting",
-  "createdAt": "2026-02-16T22:07:01Z",
-  "git": { "branch": "main", "commit": "ea0849389d0a7337301cb4f70b72bda6cc5f1cbc", "tag": "phase-P1-20260216-220701" },
-  "gates": [{"id":"docs_validate","ok":true,"cmd":"node tools/docs-validator/validate.js","duration_ms":22},{"id":"local_first","ok":true,"cmd":"node tools/security/verify-local-first.js","duration_ms":22}],
+  "createdAt": "2026-02-16T22:16:59Z",
+  "git": { "branch": "main", "commit": "ed7c00e623bcec6954da75eb9305e88066a25ec4", "tag": "phase-P1-20260216-221659" },
+  "gates": [{"id":"docs_validate","ok":true,"cmd":"node tools/docs-validator/validate.js","duration_ms":23},{"id":"local_first","ok":true,"cmd":"node tools/security/verify-local-first.js","duration_ms":24}],
   "artifacts": [
     { "name": "manifest", "path": "snapshots/P1/manifest.json" },
     { "name": "phase_report", "path": "snapshots/P1/report.md" }
