@@ -8,6 +8,7 @@ node_modules/
 
 # Codex CLI snapshots (local artifacts)
 .codex/snapshots/
+/.codex/roadmap-runs/
 
 # Imported technical bundle (source ZIP contents)
 asdev-creator-membership-ir_technical_bundle/
