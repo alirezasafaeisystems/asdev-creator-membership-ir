@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev": "node --watch dist/server.js",
+    "dev": "bash -lc 'tsc -p tsconfig.json -w --preserveWatchOutput & node --watch dist/server.js'",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js"
   },
@@ -18,4 +18,3 @@
     "typescript": "^5.5.0"
   }
 }
-

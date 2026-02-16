@@ -8,7 +8,7 @@
     "phase:run": "bash tools/phase-runner/run.sh",
     "phase:run:push": "PHASE_RUNNER_PUSH=1 bash tools/phase-runner/run.sh",
     "dev": "pnpm -C apps/web dev",
-    "api:dev": "pnpm -C apps/api build && pnpm -C apps/api start",
+    "api:dev": "pnpm -C apps/api dev",
     "build": "pnpm -C apps/api build && pnpm -C apps/web build",
     "lint": "node tools/quality-lint.js",
     "typecheck": "node tools/quality-typecheck.js",

@@ -15,3 +15,7 @@ asdev-creator-membership-ir_technical_bundle/
 # Next.js build output
 .next/
 apps/**/.next/
+
+# TypeScript build output
+dist/
+apps/**/dist/
