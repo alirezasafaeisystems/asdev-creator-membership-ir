@@ -18,10 +18,41 @@ async function main() {
     await (0, db_1.runMigrations)(db);
     const app = (0, fastify_1.default)({ logger: true });
     (0, http_1.registerApiBasics)(app);
-    (0, rateLimit_1.registerBasicRateLimit)(app, { windowMs: 60_000, max: 240 });
+    (0, rateLimit_1.registerBasicRateLimit)(app, {
+        windowMs: 60_000,
+        max: 240,
+        policies: [
+            { pattern: /^\/api\/v1\/auth\//, max: 30, windowMs: 60_000 },
+            { pattern: /^\/api\/v1\/payments\/[^/]+\/callback/, max: 20, windowMs: 60_000 },
+        ],
+    });
     const publicBaseUrl = process.env.PUBLIC_BASE_URL || `http://${config_1.config.host}:${config_1.config.port}`;
-    (0, routes_1.registerPublicRoutes)(app, db, { publicBaseUrl, paymentGateway: config_1.config.paymentGateway });
-    (0, admin_1.registerAdminRoutes)(app, db, { adminApiKey: config_1.config.adminApiKey });
+    (0, routes_1.registerPublicRoutes)(app, db, {
+        publicBaseUrl,
+        paymentGateway: config_1.config.paymentGateway,
+        paymentGatewayBaseUrl: config_1.config.paymentGatewayBaseUrl,
+        paymentGatewayWebhookSecret: config_1.config.paymentGatewayWebhookSecret,
+        paymentGatewayTimeoutMs: config_1.config.paymentGatewayTimeoutMs,
+        sessionSecret: config_1.config.sessionSecret,
+        contentStorageRoot: config_1.config.contentStorageRoot,
+    });
+    (0, admin_1.registerAdminRoutes)(app, db, {
+        publicBaseUrl,
+        paymentGatewayBaseUrl: config_1.config.paymentGatewayBaseUrl,
+        paymentGatewayWebhookSecret: config_1.config.paymentGatewayWebhookSecret,
+        paymentGatewayTimeoutMs: config_1.config.paymentGatewayTimeoutMs,
+    });
+    app.addHook('onSend', async (req, reply, payload) => {
+        reply.header('X-Content-Type-Options', 'nosniff');
+        reply.header('X-Frame-Options', 'DENY');
+        reply.header('Referrer-Policy', 'no-referrer');
+        reply.header('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+        const proto = String(req.headers?.['x-forwarded-proto'] || '').toLowerCase();
+        if (proto.includes('https')) {
+            reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+        return payload;
+    });
     app.addHook('onClose', async () => {
         await db.close();
     });

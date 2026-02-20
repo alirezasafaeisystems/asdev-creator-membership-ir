@@ -15,5 +15,8 @@ exports.config = {
     adminApiKey: process.env.ADMIN_API_KEY || '',
     paymentGateway: process.env.PAYMENT_GATEWAY || 'mock',
     paymentGatewayBaseUrl: process.env.PAYMENT_GATEWAY_BASE_URL || '',
+    paymentGatewayWebhookSecret: process.env.PAYMENT_GATEWAY_WEBHOOK_SECRET || '',
+    paymentGatewayTimeoutMs: Number(process.env.PAYMENT_GATEWAY_TIMEOUT_MS || 5000),
+    contentStorageRoot: process.env.CONTENT_STORAGE_ROOT || '/tmp/asdev-content',
     required,
 };

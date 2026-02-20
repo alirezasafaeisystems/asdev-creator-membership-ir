@@ -5,6 +5,12 @@
 - `docs/API_DB_Deployment.md`
 - `docs/Engineering_Playbook.md`
 - `docs/ALIGNMENT_REPORT.md`
+- `docs/PROJECT_STATUS.md`
+- `docs/ROADMAP_PHASED.md`
+- `docs/ROADMAP_PRODUCTION_PHASED.md`
+- `docs/ROADMAP_EXECUTION_AUTOPILOT.md`
+- `tasks/NEXT.md`
+- `tasks/NEXT_PRODUCTION.md`
 - `docs/DECISIONS.md`
 - `docs/GOVERNANCE.md`
 - `docs/CODE_OWNERSHIP.md`

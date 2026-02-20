@@ -85,6 +85,47 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_payments_idempotency_key ON payments(idempo
 CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
 CREATE INDEX IF NOT EXISTS idx_payments_subscription_id ON payments(subscription_id);
 
+CREATE TABLE IF NOT EXISTS payment_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  payment_id uuid NOT NULL REFERENCES payments(id) ON DELETE CASCADE,
+  gateway text NOT NULL,
+  gateway_ref text NOT NULL,
+  source text NOT NULL,
+  result text NOT NULL,
+  raw jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_events_payment_created ON payment_events(payment_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_events_gateway_ref ON payment_events(gateway, gateway_ref);
+
+CREATE TABLE IF NOT EXISTS webhook_receipts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  gateway text NOT NULL,
+  gateway_ref text NOT NULL,
+  source text NOT NULL,
+  receipt_key text NOT NULL,
+  payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (gateway, receipt_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_webhook_receipts_gateway_ref ON webhook_receipts(gateway, gateway_ref, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS contents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
+  title text NOT NULL,
+  storage_path text NOT NULL,
+  mime_type text NOT NULL DEFAULT 'application/octet-stream',
+  size_bytes bigint NOT NULL DEFAULT 0,
+  is_published boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_contents_creator_published ON contents(creator_id, is_published);
+
 CREATE TABLE IF NOT EXISTS audit_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_user_id uuid REFERENCES users(id) ON DELETE SET NULL,
@@ -98,4 +139,3 @@ CREATE TABLE IF NOT EXISTS audit_events (
 
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_events(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_audit_trace_id ON audit_events(trace_id);
-

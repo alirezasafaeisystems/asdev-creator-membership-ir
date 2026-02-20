@@ -1,5 +1,6 @@
 import type { Db } from './db';
 import { ApiError } from './http';
+import { hmacSha256Base64Url } from './security';
 
 export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED';
 export type SubscriptionStatus = 'PENDING_PAYMENT' | 'ACTIVE' | 'CANCELED' | 'EXPIRED';
@@ -12,6 +13,7 @@ export type GatewayCheckoutResult = {
 
 export type PaymentGatewayAdapter = {
   id: string;
+  kind: 'mock' | 'provider';
   createCheckout: (input: {
     paymentId: string;
     amount: number;
@@ -21,14 +23,22 @@ export type PaymentGatewayAdapter = {
 
   verifyCallback: (input: {
     gatewayRef: string;
-    query: Record<string, string | undefined>;
-  }) => Promise<{ ok: boolean; paidAt?: string; raw?: unknown }>;
+    payload: Record<string, string | undefined>;
+    headers?: Record<string, string | undefined>;
+  }) => Promise<{ result: 'succeeded' | 'failed' | 'pending'; paidAt?: string; raw?: unknown }>;
+
+  reconcilePending?: (input: {
+    gatewayRef: string;
+    amount: number;
+    currency: string;
+  }) => Promise<{ result: 'succeeded' | 'failed' | 'pending'; paidAt?: string; raw?: unknown }>;
 };
 
 export function createMockGatewayAdapter(baseUrl: string): PaymentGatewayAdapter {
   const normalized = baseUrl.replace(/\/+$/, '');
   return {
     id: 'mock',
+    kind: 'mock',
     async createCheckout({ paymentId, callbackUrl }) {
       const gatewayRef = `mock_${paymentId}`;
       const redirectUrl = `${normalized}/api/v1/mock-gateway/pay?paymentId=${encodeURIComponent(
@@ -36,13 +46,76 @@ export function createMockGatewayAdapter(baseUrl: string): PaymentGatewayAdapter
       )}&callback=${encodeURIComponent(callbackUrl)}`;
       return { gateway: 'mock', gatewayRef, redirectUrl };
     },
-    async verifyCallback({ gatewayRef, query }) {
-      const status = (query.status || '').toLowerCase();
-      if (!gatewayRef.startsWith('mock_')) return { ok: false, raw: { reason: 'invalid_ref' } };
-      if (status === 'ok' || status === 'paid') return { ok: true, paidAt: new Date().toISOString(), raw: query };
-      return { ok: false, raw: query };
+    async verifyCallback({ gatewayRef, payload }) {
+      const status = (payload.status || '').toLowerCase();
+      if (!gatewayRef.startsWith('mock_')) return { result: 'failed', raw: { reason: 'invalid_ref' } };
+      if (status === 'pending') return { result: 'pending', raw: payload };
+      if (status === 'ok' || status === 'paid') return { result: 'succeeded', paidAt: new Date().toISOString(), raw: payload };
+      return { result: 'failed', raw: payload };
+    },
+    async reconcilePending({ gatewayRef }) {
+      if (!gatewayRef.startsWith('mock_')) return { result: 'failed', raw: { reason: 'invalid_ref' } };
+      return { result: 'pending', raw: { source: 'mock.reconcile' } };
     },
   };
+}
+
+export function createIdpayAdapter(opts: {
+  baseUrl: string;
+  webhookSecret: string;
+  timeoutMs: number;
+}): PaymentGatewayAdapter {
+  const normalized = opts.baseUrl.replace(/\/+$/, '');
+  return {
+    id: 'idpay',
+    kind: 'provider',
+    async createCheckout({ paymentId, callbackUrl }) {
+      if (!normalized) throw new ApiError('PAYMENT_PROVIDER_TIMEOUT', 'Payment provider base URL is missing', 503);
+      const gatewayRef = `idpay_${paymentId}`;
+      const redirectUrl = `${normalized}/pay/${encodeURIComponent(paymentId)}?callback=${encodeURIComponent(callbackUrl)}`;
+      return { gateway: 'idpay', gatewayRef, redirectUrl };
+    },
+    async verifyCallback({ gatewayRef, payload, headers }) {
+      const status = String(payload.status || '').toLowerCase();
+      const signatureHeader = String(headers?.['x-gateway-signature'] || payload.signature || '');
+      const signed = `${gatewayRef}:${status}`;
+      const expected = hmacSha256Base64Url(opts.webhookSecret, signed);
+      if (!signatureHeader || signatureHeader !== expected) {
+        throw new ApiError('PAYMENT_WEBHOOK_SIGNATURE_INVALID', 'Invalid payment callback signature', 401);
+      }
+      if (status === 'pending') return { result: 'pending', raw: payload };
+      if (status === 'ok' || status === 'paid' || status === 'succeeded') {
+        return { result: 'succeeded', paidAt: new Date().toISOString(), raw: payload };
+      }
+      return { result: 'failed', raw: payload };
+    },
+    async reconcilePending({ gatewayRef }) {
+      // Local-first deterministic reconciliation:
+      // do not randomly mutate payment state without provider evidence.
+      return {
+        result: 'pending',
+        raw: { source: 'idpay.reconcile', mode: 'local', reason: 'no_provider_polling_evidence', gatewayRef },
+      };
+    },
+  };
+}
+
+export function createPaymentGatewayAdapter(input: {
+  gatewayId: string;
+  baseUrl: string;
+  webhookSecret?: string;
+  timeoutMs?: number;
+}) {
+  if (input.gatewayId === 'mock') return createMockGatewayAdapter(input.baseUrl);
+  if (input.gatewayId === 'idpay') {
+    if (!input.webhookSecret) throw new ApiError('PAYMENT_PROVIDER_TIMEOUT', 'PAYMENT_GATEWAY_WEBHOOK_SECRET is required', 503);
+    return createIdpayAdapter({
+      baseUrl: input.baseUrl,
+      webhookSecret: input.webhookSecret,
+      timeoutMs: Math.max(500, Number(input.timeoutMs || 5000)),
+    });
+  }
+  throw new ApiError('PAYMENT_PROVIDER_TIMEOUT', 'Gateway not configured', 501);
 }
 
 export async function getPlan(db: Db, planId: string) {
@@ -125,9 +198,10 @@ export async function attachGatewayRef(db: Db, input: { paymentId: string; gatew
 export async function applyPaymentResult(db: Db, input: {
   gateway: string;
   gatewayRef: string;
-  ok: boolean;
+  result: 'succeeded' | 'failed' | 'pending';
   paidAt?: string;
   raw?: unknown;
+  source?: string;
 }) {
   const r = await db.pool.query(
     `SELECT p.*, s.status as sub_status
@@ -139,11 +213,39 @@ export async function applyPaymentResult(db: Db, input: {
   if (r.rowCount !== 1) throw new ApiError('PAYMENT_CALLBACK_INVALID', 'Unknown payment reference', 400);
   const payment = r.rows[0] as any;
   if (payment.status === 'SUCCEEDED') {
+    await recordPaymentEvent(db, {
+      paymentId: payment.id,
+      gateway: input.gateway,
+      gatewayRef: input.gatewayRef,
+      source: input.source || 'unknown',
+      result: 'succeeded',
+      raw: { reason: 'already_succeeded', inputResult: input.result, raw: input.raw },
+    });
     return { payment, subscriptionUpdated: false };
   }
 
-  if (!input.ok) {
+  if (input.result === 'pending') {
+    await recordPaymentEvent(db, {
+      paymentId: payment.id,
+      gateway: input.gateway,
+      gatewayRef: input.gatewayRef,
+      source: input.source || 'unknown',
+      result: 'pending',
+      raw: input.raw,
+    });
+    return { payment, subscriptionUpdated: false };
+  }
+
+  if (input.result === 'failed') {
     await db.pool.query(`UPDATE payments SET status='FAILED' WHERE id=$1`, [payment.id]);
+    await recordPaymentEvent(db, {
+      paymentId: payment.id,
+      gateway: input.gateway,
+      gatewayRef: input.gatewayRef,
+      source: input.source || 'unknown',
+      result: 'failed',
+      raw: input.raw,
+    });
     return { payment: { ...payment, status: 'FAILED' }, subscriptionUpdated: false };
   }
 
@@ -151,6 +253,14 @@ export async function applyPaymentResult(db: Db, input: {
     `UPDATE payments SET status='SUCCEEDED', paid_at=$2 WHERE id=$1`,
     [payment.id, input.paidAt ? new Date(input.paidAt) : new Date()],
   );
+  await recordPaymentEvent(db, {
+    paymentId: payment.id,
+    gateway: input.gateway,
+    gatewayRef: input.gatewayRef,
+    source: input.source || 'unknown',
+    result: 'succeeded',
+    raw: input.raw,
+  });
 
   // Activate subscription idempotently.
   await db.pool.query(
@@ -167,3 +277,17 @@ export async function applyPaymentResult(db: Db, input: {
   return { payment: updatedPayment, subscriptionUpdated: true };
 }
 
+export async function recordPaymentEvent(db: Db, input: {
+  paymentId: string;
+  gateway: string;
+  gatewayRef: string;
+  source: string;
+  result: 'succeeded' | 'failed' | 'pending';
+  raw?: unknown;
+}) {
+  await db.pool.query(
+    `INSERT INTO payment_events (payment_id, gateway, gateway_ref, source, result, raw)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb)`,
+    [input.paymentId, input.gateway, input.gatewayRef, input.source, input.result, JSON.stringify(input.raw ?? {})],
+  );
+}

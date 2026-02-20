@@ -4,6 +4,10 @@ exports.signUp = signUp;
 exports.signIn = signIn;
 exports.createSession = createSession;
 exports.getUserBySession = getUserBySession;
+exports.getUserById = getUserById;
+exports.revokeSession = revokeSession;
+exports.revokeAllSessions = revokeAllSessions;
+exports.rotateSession = rotateSession;
 const http_1 = require("./http");
 const security_1 = require("./security");
 async function signUp(db, input) {
@@ -35,6 +39,15 @@ async function createSession(db, userId) {
     const token = (0, security_1.randomToken)(32);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14); // 14d
     await db.pool.query(`INSERT INTO sessions (user_id, token, expires_at) VALUES ($1, $2, $3)`, [userId, token, expiresAt]);
+    // Keep a bounded number of active sessions per user.
+    await db.pool.query(`DELETE FROM sessions
+      WHERE user_id=$1
+        AND id IN (
+          SELECT id FROM sessions
+           WHERE user_id=$1
+           ORDER BY created_at DESC
+           OFFSET 20
+        )`, [userId]);
     return { token, expiresAt: expiresAt.toISOString() };
 }
 async function getUserBySession(db, token) {
@@ -45,4 +58,26 @@ async function getUserBySession(db, token) {
     if (r.rowCount !== 1)
         return null;
     return r.rows[0];
+}
+async function getUserById(db, userId) {
+    const r = await db.pool.query(`SELECT id, email, role, name FROM users WHERE id=$1`, [userId]);
+    if (r.rowCount !== 1)
+        return null;
+    return r.rows[0];
+}
+async function revokeSession(db, token) {
+    const r = await db.pool.query(`DELETE FROM sessions WHERE token=$1 RETURNING id`, [token]);
+    return r.rowCount === 1;
+}
+async function revokeAllSessions(db, userId) {
+    const r = await db.pool.query(`DELETE FROM sessions WHERE user_id=$1 RETURNING id`, [userId]);
+    return Number(r.rowCount || 0);
+}
+async function rotateSession(db, token) {
+    const removed = await db.pool.query(`DELETE FROM sessions WHERE token=$1 AND expires_at > now() RETURNING user_id`, [token]);
+    if (removed.rowCount !== 1)
+        throw new http_1.ApiError('AUTH_INVALID_TOKEN', 'Invalid token', 401);
+    const userId = String(removed.rows[0].user_id);
+    const session = await createSession(db, userId);
+    return { userId, session };
 }

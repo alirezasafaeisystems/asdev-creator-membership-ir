@@ -30,11 +30,11 @@ Instructions:
 4) Add/extend automated gates:
    - lint, typecheck, unit tests
    - "local-first" scan to fail CI if external runtime dependencies exist
-5) Ensure docker-compose local-first environment works:
+5) Ensure local-first environment works without Docker dependency:
    - `pnpm install`
    - `pnpm test`
    - `pnpm build`
-   - `docker compose up`
+   - `DATABASE_URL=... pnpm -w local:stack:start`
 6) Output:
    - a short CHANGELOG_APPLIED.md describing what was changed
    - updated docs if assumptions change
