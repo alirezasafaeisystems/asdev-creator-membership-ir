@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 evidence:record:gates /home/dev/Project_Me/asdev-creator-membership-ir
+> bash scripts/automation/record-local-evidence.sh gates
+
+LOCAL_EVIDENCE_WRITTEN /home/dev/Project_Me/asdev-creator-membership-ir/.codex/local-evidence/20260221-131759

@@ -1,0 +1,32 @@
+// 03-shared/queue-worker/JOB_MODEL.prisma
+// این snippet را داخل schema.prisma خودتان paste کنید.
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  type        String
+  payload     Json
+
+  status      JobStatus @default(QUEUED)
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+
+  runAt       DateTime  @default(now())
+  timeoutMs   Int       @default(600000)
+
+  lockedAt    DateTime?
+  lockedBy    String?
+  lastError   String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, runAt])
+  @@index([type, status])
+}

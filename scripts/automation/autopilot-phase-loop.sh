@@ -21,6 +21,9 @@ ROADMAP_RUNNER_ENABLED="${AUTOPILOT_ROADMAP_RUNNER:-0}"
 ROADMAP_RUNNER_MODE="${AUTOPILOT_ROADMAP_MODE:-semi}"
 ROADMAP_RUNNER_COOLDOWN_SEC="${AUTOPILOT_ROADMAP_COOLDOWN_SEC:-21600}"
 ROADMAP_LAST_RUN_FILE="$ROOT_DIR/.local-run/roadmap-runner.last"
+PRODUCTION_AUTO_ENABLED="${AUTOPILOT_PRODUCTION_AUTO:-1}"
+PRODUCTION_AUTO_COOLDOWN_SEC="${AUTOPILOT_PRODUCTION_AUTO_COOLDOWN_SEC:-3600}"
+PRODUCTION_AUTO_LAST_RUN_FILE="$ROOT_DIR/.local-run/production-auto.last"
 
 run_roadmap_runner_if_due() {
   if [[ "$ROADMAP_RUNNER_ENABLED" != "1" ]]; then
@@ -61,6 +64,31 @@ run_roadmap_runner_if_due() {
     log "external roadmap runner completed with actionable summary"
   else
     log "external roadmap runner failed (non-blocking)"
+  fi
+}
+
+run_production_auto_if_due() {
+  if [[ "$PRODUCTION_AUTO_ENABLED" != "1" ]]; then
+    return 0
+  fi
+  local now last delta
+  now="$(date +%s)"
+  last=0
+  if [[ -f "$PRODUCTION_AUTO_LAST_RUN_FILE" ]]; then
+    last="$(cat "$PRODUCTION_AUTO_LAST_RUN_FILE" 2>/dev/null || echo 0)"
+  fi
+  delta=$((now - last))
+  if [[ "$delta" -lt "$PRODUCTION_AUTO_COOLDOWN_SEC" ]]; then
+    log "production auto skipped (cooldown ${PRODUCTION_AUTO_COOLDOWN_SEC}s, elapsed ${delta}s)"
+    return 0
+  fi
+
+  log "running production auto-complete"
+  if pnpm -w production:auto:complete; then
+    date +%s > "$PRODUCTION_AUTO_LAST_RUN_FILE"
+    log "production auto-complete finished"
+  else
+    log "production auto-complete failed (non-blocking)"
   fi
 }
 
@@ -113,5 +141,6 @@ pnpm -w roadmap:sync-next:production
 pnpm -w status:local-report
 pnpm -w runtime:health:report || true
 run_roadmap_runner_if_due
+run_production_auto_if_due
 
 log "autopilot loop completed"

@@ -59,6 +59,12 @@ Last verified: 2026-02-20
   - callback replay protection via `webhook_receipts` (duplicate webhook/callback guarded)
   - baseline security headers enforced at API edge (`nosniff`, `frame deny`, `referrer policy`, `permissions policy`)
   - database backup/restore automation scripts (`db:backup`, `db:restore`)
+- Codex import hardening progress (new):
+  - imported membership blueprint pack to `docs/blueprints/codex-import/` with index
+  - normalization utilities implemented in `apps/api/src/normalize.ts`
+  - ops summary JSON v1 endpoint implemented: `GET /api/v1/admin/ops/summary` (+ alias `/api/admin/ops/summary`)
+  - db-backed worker queue implemented (`jobs` table, `worker:dev`, `jobs:enqueue:ops`)
+  - minimal admin ops page implemented at `/admin/ops`
 
 ## Not Done Yet
 - (current critical items: none for local-first runtime baseline)

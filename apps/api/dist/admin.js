@@ -5,6 +5,7 @@ const http_1 = require("./http");
 const payments_1 = require("./payments");
 const audit_1 = require("./audit");
 const auth_1 = require("./auth");
+const opsSummary_1 = require("./opsSummary");
 function registerAdminRoutes(app, db, opts) {
     function getAuthToken(req) {
         const h = String(req.headers.authorization || '');
@@ -113,6 +114,14 @@ function registerAdminRoutes(app, db, opts) {
             payments: paymentByStatus,
             recentAudit: audits.rows,
         };
+    });
+    app.get('/api/v1/admin/ops/summary', async (req) => {
+        await requireAdminRole(req, ['platform_admin', 'support_admin', 'auditor']);
+        return (0, opsSummary_1.buildMembershipOpsSummary)(db, { rateLimitConfigured: true });
+    });
+    app.get('/api/admin/ops/summary', async (req) => {
+        await requireAdminRole(req, ['platform_admin', 'support_admin', 'auditor']);
+        return (0, opsSummary_1.buildMembershipOpsSummary)(db, { rateLimitConfigured: true });
     });
     // Reconcile pending payments through adapter and return structured report.
     app.post('/api/v1/payments/reconcile', async (req) => {

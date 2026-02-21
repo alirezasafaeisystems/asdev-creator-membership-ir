@@ -19,3 +19,6 @@ hard = "strong"
 long_session_compact = true
 session_memory_file = "~/codex-session-memory.md"
 session_end_summary_file = "~/codex-bootstrap-summary.md"
+
+[asdev.model_routing]
+long_session_compact = true

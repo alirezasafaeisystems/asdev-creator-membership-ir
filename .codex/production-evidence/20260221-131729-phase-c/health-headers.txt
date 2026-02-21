@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+x-trace-id: 754c2dfd-a63c-41f5-bf8e-6729faceffb4
+content-type: application/json; charset=utf-8
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+permissions-policy: geolocation=(), microphone=(), camera=()
+content-length: 11
+Date: Sat, 21 Feb 2026 13:17:33 GMT
+Connection: keep-alive
+Keep-Alive: timeout=72
+
+{"ok":true}

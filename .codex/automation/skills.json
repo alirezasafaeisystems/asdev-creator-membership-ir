@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "required": [
+    "fix-ci",
+    "quick-review",
+    "security-scan-lite",
+    "verify-node"
+  ],
+  "sources": {
+    "fix-ci": ".agents/skills/fix-ci/SKILL.md",
+    "quick-review": ".agents/skills/quick-review/SKILL.md",
+    "security-scan-lite": ".agents/skills/security-scan-lite/SKILL.md",
+    "verify-node": ".agents/skills/verify-node/SKILL.md"
+  }
+}

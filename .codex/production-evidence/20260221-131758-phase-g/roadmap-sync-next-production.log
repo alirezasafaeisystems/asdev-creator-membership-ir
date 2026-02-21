@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 roadmap:sync-next:production /home/dev/Project_Me/asdev-creator-membership-ir
+> node scripts/automation/sync-next-production.js
+
+SYNC_NEXT_PRODUCTION_OK phases=7 output=tasks/NEXT_PRODUCTION.md

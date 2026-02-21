@@ -1,0 +1,6 @@
+
+> asdev-creator-membership-ir@0.1.0 security:scan /home/dev/Project_Me/asdev-creator-membership-ir
+> bash -lc 'if rg -n "(ghp_[A-Za-z0-9]{20,}|sk_live_[A-Za-z0-9]+|-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16})" -S . --glob "!**/.git/**" --glob "!**/node_modules/**"; then echo SECRET_PATTERN_DETECTED; exit 1; else echo SECURITY_SCAN_OK; fi' && node tools/security/validate-sensitive-policies.js
+
+SECURITY_SCAN_OK
+SENSITIVE_POLICY_VALIDATE_OK

@@ -1,21 +1,21 @@
 # Local Runtime Status
 
-Generated: 2026-02-20T20:10:33.055Z
+Generated: 2026-02-21T13:25:45.402Z
 
-Evidence: mode=gates runId=20260220-201016 overallOk=true
+Evidence: mode=gates runId=20260221-132447 overallOk=true
 
 ## Evidence Commands
-- [OK] `pnpm -w roadmap:sync-next` (189ms)
-- [OK] `pnpm -w docs:validate` (190ms)
-- [OK] `pnpm -w lint` (3288ms)
-- [OK] `pnpm -w typecheck` (186ms)
-- [OK] `pnpm -w local-first:scan` (209ms)
-- [OK] `pnpm -w test` (470ms)
-- [OK] `pnpm -w build` (7174ms)
-- [OK] `pnpm -w contracts:check` (181ms)
-- [OK] `pnpm -w perf:check` (179ms)
-- [OK] `pnpm -w test:integration` (402ms)
-- [OK] `pnpm -w test:e2e` (1726ms)
+- [OK] `pnpm -w roadmap:sync-next` (180ms)
+- [OK] `pnpm -w docs:validate` (178ms)
+- [OK] `pnpm -w lint` (610ms)
+- [OK] `pnpm -w typecheck` (180ms)
+- [OK] `pnpm -w local-first:scan` (183ms)
+- [OK] `pnpm -w test` (225ms)
+- [OK] `pnpm -w build` (7091ms)
+- [OK] `pnpm -w contracts:check` (179ms)
+- [OK] `pnpm -w perf:check` (177ms)
+- [OK] `pnpm -w test:integration` (405ms)
+- [OK] `pnpm -w test:e2e` (1243ms)
 
 ## Phase Board Snapshot
 ### Phase 0 - Foundation Reliability

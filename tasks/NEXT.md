@@ -1,6 +1,6 @@
 # Next Tasks (Phased, No Timeline)
 
-> Updated: 2026-02-20
+> Updated: 2026-02-21
 > Rule: this plan is phase-based and has no calendar deadline.
 
 ## Auto Baseline

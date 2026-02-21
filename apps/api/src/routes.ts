@@ -12,6 +12,7 @@ import {
   applyPaymentResult,
 } from './payments';
 import { hmacSha256Base64Url } from './security';
+import { normalizeCreatorSlug, normalizeReturnUrl } from './normalize';
 
 function getAuthToken(req: any): string | null {
   const h = String(req.headers.authorization || '');
@@ -217,14 +218,22 @@ export function registerPublicRoutes(app: FastifyInstance, db: Db, opts: {
 
     const body = req.body || {};
     if (!body.slug || !body.displayName) throw new ApiError('CREATOR_INVALID_REQUEST', 'slug/displayName required', 400);
+    const normalizedSlug = normalizeCreatorSlug(body.slug);
     try {
       const r = await db.pool.query(
         `INSERT INTO creators (user_id, slug, display_name, bio, social_links)
          VALUES ($1, $2, $3, $4, $5::jsonb)
          RETURNING *`,
-        [user.id, String(body.slug), String(body.displayName), String(body.bio || ''), JSON.stringify(body.socialLinks || {})],
+        [user.id, normalizedSlug.slug, String(body.displayName), String(body.bio || ''), JSON.stringify(body.socialLinks || {})],
       );
-      await auditEvent(db, { actorUserId: user.id, action: 'creator.create', entityType: 'creator', entityId: r.rows[0].id, payload: { slug: body.slug }, traceId });
+      await auditEvent(db, {
+        actorUserId: user.id,
+        action: 'creator.create',
+        entityType: 'creator',
+        entityId: r.rows[0].id,
+        payload: { slug: normalizedSlug.slug, slugWarnings: normalizedSlug.warnings },
+        traceId,
+      });
       return r.rows[0];
     } catch (e: any) {
       if (String(e?.code) === '23505') throw new ApiError('CREATOR_SLUG_EXISTS', 'Slug already exists', 409);
@@ -273,6 +282,7 @@ export function registerPublicRoutes(app: FastifyInstance, db: Db, opts: {
     const body = req.body || {};
     const planId = String(body.planId || '');
     if (!planId) throw new ApiError('SUBSCRIPTION_INVALID_REQUEST', 'planId required', 400);
+    const returnUrl = normalizeReturnUrl(body.returnUrl);
     const idempotencyKey = req.headers['idempotency-key'] ? String(req.headers['idempotency-key']) : null;
 
     const created = await createSubscriptionCheckout(db, {
@@ -322,6 +332,7 @@ export function registerPublicRoutes(app: FastifyInstance, db: Db, opts: {
       paymentId: payment.id,
       gateway: checkout.gateway,
       redirectUrl: checkout.redirectUrl,
+      returnUrl,
     };
   });
 

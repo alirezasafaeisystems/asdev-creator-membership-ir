@@ -1,0 +1,14 @@
+
+> asdev-creator-membership-ir@0.1.0 test:regression /home/dev/Project_Me/asdev-creator-membership-ir
+> pnpm -w test:integration && pnpm -w test:e2e
+
+
+> asdev-creator-membership-ir@0.1.0 test:integration /home/dev/Project_Me/asdev-creator-membership-ir
+> node tools/quality-integration.js
+
+QUALITY_INTEGRATION_OK phases=5
+
+> asdev-creator-membership-ir@0.1.0 test:e2e /home/dev/Project_Me/asdev-creator-membership-ir
+> node tools/quality-e2e.js
+
+QUALITY_E2E_OK

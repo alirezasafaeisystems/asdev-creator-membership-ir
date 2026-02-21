@@ -101,3 +101,18 @@
 ## Production Program
 - برای نقشه راه تکمیلی تا سطح Production-grade:
   - `docs/ROADMAP_PRODUCTION_PHASED.md`
+
+## Codex Import: Ops Hardening Pack (Membership)
+- Scope:
+  - import and index blueprint package under `docs/blueprints/codex-import/`
+  - normalization utilities (`normalizeCreatorSlug`, `normalizeEmail`, `normalizeIranMobile`, `normalizeReturnUrl`)
+  - callback safety hardening (amount mismatch + status consistency controls)
+  - admin ops summary (`asdev.membership.ops.summary.v1`) API + minimal admin UI page
+  - DB-backed membership worker jobs (reconcile, expire, token cleanup)
+- Acceptance Criteria:
+  - 20+ unit tests pass for normalization and malicious-input cases
+  - replayed callbacks remain side-effect safe; mismatched amount never activates subscription
+  - `GET /api/v1/admin/ops/summary` and `GET /api/admin/ops/summary` return deterministic JSON with `schema` and `generatedAt`
+  - `pnpm -w worker:dev` processes queued jobs from `jobs` table
+  - `pnpm -w jobs:enqueue:ops` enqueues membership maintenance jobs
+  - runbooks for ops summary and worker operation are documented in `docs/RUNBOOKS/`

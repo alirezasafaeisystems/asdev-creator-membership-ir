@@ -10,12 +10,14 @@ exports.revokeAllSessions = revokeAllSessions;
 exports.rotateSession = rotateSession;
 const http_1 = require("./http");
 const security_1 = require("./security");
+const normalize_1 = require("./normalize");
 async function signUp(db, input) {
+    const email = (0, normalize_1.normalizeEmail)(input.email);
     const passwordHash = (0, security_1.hashPassword)(input.password);
     try {
         const r = await db.pool.query(`INSERT INTO users (email, password_hash, name, role)
        VALUES ($1, $2, $3, 'user')
-       RETURNING id, email, role, name`, [input.email.toLowerCase(), passwordHash, input.name || '']);
+       RETURNING id, email, role, name`, [email, passwordHash, input.name || '']);
         return r.rows[0];
     }
     catch (e) {
@@ -26,7 +28,8 @@ async function signUp(db, input) {
     }
 }
 async function signIn(db, input) {
-    const r = await db.pool.query(`SELECT id, email, role, name, password_hash FROM users WHERE email=$1`, [input.email.toLowerCase()]);
+    const email = (0, normalize_1.normalizeEmail)(input.email);
+    const r = await db.pool.query(`SELECT id, email, role, name, password_hash FROM users WHERE email=$1`, [email]);
     if (r.rowCount !== 1)
         throw new http_1.ApiError('AUTH_INVALID_CREDENTIALS', 'Invalid credentials', 401);
     const row = r.rows[0];

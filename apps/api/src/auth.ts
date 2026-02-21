@@ -1,17 +1,19 @@
 import type { Db } from './db';
 import { ApiError } from './http';
 import { hashPassword, randomToken, verifyPassword } from './security';
+import { normalizeEmail } from './normalize';
 
 export type AuthUser = { id: string; email: string; role: string; name: string };
 
 export async function signUp(db: Db, input: { email: string; password: string; name?: string }) {
+  const email = normalizeEmail(input.email);
   const passwordHash = hashPassword(input.password);
   try {
     const r = await db.pool.query(
       `INSERT INTO users (email, password_hash, name, role)
        VALUES ($1, $2, $3, 'user')
        RETURNING id, email, role, name`,
-      [input.email.toLowerCase(), passwordHash, input.name || ''],
+      [email, passwordHash, input.name || ''],
     );
     return r.rows[0] as AuthUser;
   } catch (e: any) {
@@ -23,9 +25,10 @@ export async function signUp(db: Db, input: { email: string; password: string; n
 }
 
 export async function signIn(db: Db, input: { email: string; password: string }) {
+  const email = normalizeEmail(input.email);
   const r = await db.pool.query(
     `SELECT id, email, role, name, password_hash FROM users WHERE email=$1`,
-    [input.email.toLowerCase()],
+    [email],
   );
   if (r.rowCount !== 1) throw new ApiError('AUTH_INVALID_CREDENTIALS', 'Invalid credentials', 401);
   const row = r.rows[0] as any;

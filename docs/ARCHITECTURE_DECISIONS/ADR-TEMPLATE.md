@@ -1,3 +1,16 @@
-# ADR-TEMPLATE
+# ADR Template
 
-Operational baseline documentation for ADR-TEMPLATE.
+## Title
+Short decision title.
+
+## Status
+Proposed | Accepted | Superseded.
+
+## Context
+Problem statement, constraints, and alternatives.
+
+## Decision
+Chosen approach with rationale.
+
+## Consequences
+Tradeoffs, migration impact, and follow-up tasks.

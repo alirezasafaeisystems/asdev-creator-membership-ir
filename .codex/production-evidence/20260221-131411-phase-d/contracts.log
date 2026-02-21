@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 contracts:check /home/dev/Project_Me/asdev-creator-membership-ir
+> node tools/contracts-check.js
+
+CONTRACTS_OK

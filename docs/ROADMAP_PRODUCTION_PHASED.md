@@ -108,3 +108,9 @@
 - One-shot bootstrap: `pnpm -w run:local:full`
 - Continuous non-redundant loop: `pnpm -w autopilot:phase-loop`
 - Background autonomous execution: `pnpm -w autopilot:daemon:start`
+
+## Production Execution Pack
+- Phase A (payment go-live evidence):
+  - `DATABASE_URL=... PAYMENT_GATEWAY_WEBHOOK_SECRET=... pnpm -w production:phase-a`
+- Phase B (DR drill evidence):
+  - `DATABASE_URL=... pnpm -w production:phase-b`

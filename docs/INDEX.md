@@ -1,32 +1,32 @@
 # Documentation Index
 
-- `docs/STYLE_GUIDE.md`
-- `docs/PRD.md`
-- `docs/API_DB_Deployment.md`
-- `docs/Engineering_Playbook.md`
-- `docs/ALIGNMENT_REPORT.md`
+## Core Status and Planning
 - `docs/PROJECT_STATUS.md`
 - `docs/ROADMAP_PHASED.md`
 - `docs/ROADMAP_PRODUCTION_PHASED.md`
 - `docs/ROADMAP_EXECUTION_AUTOPILOT.md`
+- `docs/ROADMAP_EXECUTION_REAL.md`
 - `tasks/NEXT.md`
 - `tasks/NEXT_PRODUCTION.md`
+- `tasks/ROADMAP_EXECPLAN.md`
+
+## Product and Governance
+- `docs/PRD.md`
+- `docs/STYLE_GUIDE.md`
 - `docs/DECISIONS.md`
+- `docs/ALIGNMENT_REPORT.md`
 - `docs/GOVERNANCE.md`
 - `docs/CODE_OWNERSHIP.md`
 - `docs/CONTRIBUTING.md`
+- `docs/Engineering_Playbook.md`
+
+## Policies
 - `docs/POLICIES/SECURITY_POLICY.md`
 - `docs/POLICIES/DATA_POLICY.md`
 - `docs/POLICIES/DEPENDENCY_POLICY.md`
 - `docs/POLICIES/BRANCH_RELEASE_POLICY.md`
-- `docs/DEVELOPMENT/01_Local_Dev.md`
-- `docs/DEVELOPMENT/02_Coding_Standards.md`
-- `docs/DEVELOPMENT/03_Test_Strategy.md`
-- `docs/DEVELOPMENT/04_Automation_PhaseRunner.md`
-- `docs/DEVELOPMENT/Definition_of_Done.md`
-- `docs/DEPLOYMENT/01_Environments.md`
-- `docs/DEPLOYMENT/02_Docker_Compose_LocalFirst.md`
-- `docs/DEPLOYMENT/03_Release_Runbook.md`
+
+## Architecture
 - `docs/ARCHITECTURE/00_System_Overview.md`
 - `docs/ARCHITECTURE/01_Modular_Monolith.md`
 - `docs/ARCHITECTURE/02_Domain_Model.md`
@@ -41,19 +41,35 @@
 - `docs/ARCHITECTURE/Error_Codes.md`
 - `docs/ARCHITECTURE/RBAC_Matrix.md`
 - `docs/ARCHITECTURE_DECISIONS/ADR-TEMPLATE.md`
-- `docs/FRONTEND/01_UI_UX_Standards.md`
-- `docs/FRONTEND/02_SEO_Strategy.md`
-- `docs/FRONTEND/03_Search_Filter_UX.md`
+
+## Development and Deployment
+- `docs/DEVELOPMENT/01_Local_Dev.md`
+- `docs/DEVELOPMENT/02_Coding_Standards.md`
+- `docs/DEVELOPMENT/03_Test_Strategy.md`
+- `docs/DEVELOPMENT/04_Automation_PhaseRunner.md`
+- `docs/DEVELOPMENT/Definition_of_Done.md`
+- `docs/API_DB_Deployment.md`
+- `docs/DEPLOYMENT/01_Environments.md`
+- `docs/DEPLOYMENT/02_Docker_Compose_LocalFirst.md`
+- `docs/DEPLOYMENT/03_Release_Runbook.md`
+
+## Runbooks and Runtime
 - `docs/RUNBOOKS/Payment_Issues.md`
 - `docs/RUNBOOKS/Download_Issues.md`
 - `docs/RUNBOOKS/Payout_Disputes.md`
 - `docs/RUNBOOKS/Security_Incident.md`
+- `docs/RUNBOOKS/Ops_Summary.md`
+- `docs/RUNBOOKS/Worker_Membership.md`
+- `docs/RUNBOOKS/Production_Payment_GoLive.md`
+- `docs/RUNBOOKS/DR_Drill.md`
+- `docs/RUNTIME/LOCAL_STATUS.md`
 
-## Analysis (Technical Bundle)
+## Reference and Archive
 - `docs/ANALYSIS/TECHNICAL_SPEC.md`
 - `docs/ANALYSIS/API_MAP.md`
 - `docs/ANALYSIS/DATABASE_SCHEMA.md`
 - `docs/ANALYSIS/COMPETITIVE_ANALYSIS_IR.md`
 - `docs/ANALYSIS/ROADMAP.md`
-- `docs/ANALYSIS/CODEX_CLI_PROMPT.md`
 - `docs/WIREFRAMES/README.md`
+- `docs/blueprints/codex-import/INDEX.md`
+- `docs/strategic-execution/README.md`

@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 roadmap:sync-next /home/dev/Project_Me/asdev-creator-membership-ir
+> node scripts/automation/sync-next-from-phased-roadmap.js
+
+SYNC_NEXT_OK phases=8 output=tasks/NEXT.md

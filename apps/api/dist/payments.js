@@ -146,9 +146,10 @@ async function attachGatewayRef(db, input) {
     }
 }
 async function applyPaymentResult(db, input) {
-    const r = await db.pool.query(`SELECT p.*, s.status as sub_status
+    const r = await db.pool.query(`SELECT p.*, s.status as sub_status, plan.price_amount AS expected_amount, plan.currency AS expected_currency
        FROM payments p
        JOIN subscriptions s ON s.id = p.subscription_id
+       JOIN plans plan ON plan.id = s.plan_id
       WHERE p.gateway=$1 AND p.gateway_ref=$2`, [input.gateway, input.gatewayRef]);
     if (r.rowCount !== 1)
         throw new http_1.ApiError('PAYMENT_CALLBACK_INVALID', 'Unknown payment reference', 400);
@@ -186,6 +187,40 @@ async function applyPaymentResult(db, input) {
             raw: input.raw,
         });
         return { payment: { ...payment, status: 'FAILED' }, subscriptionUpdated: false };
+    }
+    const expectedAmount = Number(payment.expected_amount || 0);
+    const expectedCurrency = String(payment.expected_currency || payment.currency || 'IRR');
+    const actualAmount = Number(payment.amount || 0);
+    const actualCurrency = String(payment.currency || 'IRR');
+    if (actualAmount !== expectedAmount || actualCurrency !== expectedCurrency) {
+        await db.pool.query(`UPDATE payments SET status='FAILED' WHERE id=$1`, [payment.id]);
+        await recordPaymentEvent(db, {
+            paymentId: payment.id,
+            gateway: input.gateway,
+            gatewayRef: input.gatewayRef,
+            source: input.source || 'unknown',
+            result: 'failed',
+            raw: {
+                reason: 'amount_mismatch',
+                expectedAmount,
+                actualAmount,
+                expectedCurrency,
+                actualCurrency,
+                raw: input.raw,
+            },
+        });
+        return { payment: { ...payment, status: 'FAILED' }, subscriptionUpdated: false };
+    }
+    if (!['PENDING_PAYMENT', 'ACTIVE'].includes(String(payment.sub_status))) {
+        await recordPaymentEvent(db, {
+            paymentId: payment.id,
+            gateway: input.gateway,
+            gatewayRef: input.gatewayRef,
+            source: input.source || 'unknown',
+            result: 'failed',
+            raw: { reason: 'subscription_status_inconsistent', currentSubscriptionStatus: payment.sub_status, raw: input.raw },
+        });
+        return { payment, subscriptionUpdated: false };
     }
     await db.pool.query(`UPDATE payments SET status='SUCCEEDED', paid_at=$2 WHERE id=$1`, [payment.id, input.paidAt ? new Date(input.paidAt) : new Date()]);
     await recordPaymentEvent(db, {

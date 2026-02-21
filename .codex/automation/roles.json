@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "mode": "autonomous",
+  "roles": {
+    "phase_0": ["platform_engineer", "qa_guardian"],
+    "phase_1": ["payments_engineer", "qa_guardian"],
+    "phase_2": ["security_engineer", "backend_engineer"],
+    "phase_3": ["content_security_engineer", "backend_engineer"],
+    "phase_4": ["sre_engineer", "backend_engineer"],
+    "phase_5": ["operations_engineer", "support_admin"],
+    "phase_6": ["release_engineer", "sre_engineer"],
+    "phase_7": ["performance_engineer", "reliability_engineer"]
+  }
+}

@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 local-first:scan /home/dev/Project_Me/asdev-creator-membership-ir
+> node tools/security/verify-local-first.js
+
+LOCAL_FIRST_SCAN_OK files=32

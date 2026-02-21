@@ -1,0 +1,5 @@
+
+> asdev-creator-membership-ir@0.1.0 smoke:auth-session /home/dev/Project_Me/asdev-creator-membership-ir
+> bash scripts/automation/smoke-auth-session.sh
+
+SMOKE_AUTH_SESSION_OK

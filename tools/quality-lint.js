@@ -4,7 +4,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const root = process.cwd();
-const ignore = new Set(['.git', 'node_modules', 'snapshots']);
+const ignore = new Set(['.git', 'node_modules', 'snapshots', '.next', 'dist', '.local-run']);
 
 function walk(dir, acc) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

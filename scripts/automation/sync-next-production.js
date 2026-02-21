@@ -13,6 +13,7 @@ const smokeIdpayPath = path.join(root, 'scripts/automation/smoke-idpay-callback.
 const dbBackupPath = path.join(root, 'scripts/automation/db-backup.sh');
 const dbRestorePath = path.join(root, 'scripts/automation/db-restore.sh');
 const packageJsonPath = path.join(root, 'package.json');
+const productionEvidenceRootPath = path.join(root, '.codex/production-evidence');
 
 if (!fs.existsSync(roadmapPath)) {
   console.error(`ERROR: missing ${roadmapPath}`);
@@ -56,6 +57,12 @@ const server = fs.existsSync(serverPath) ? fs.readFileSync(serverPath, 'utf8') :
 const smokeIdpay = fs.existsSync(smokeIdpayPath) ? fs.readFileSync(smokeIdpayPath, 'utf8') : '';
 const packageJson = fs.existsSync(packageJsonPath) ? fs.readFileSync(packageJsonPath, 'utf8') : '';
 
+function hasProductionEvidenceTag(tag) {
+  if (!fs.existsSync(productionEvidenceRootPath)) return false;
+  const entries = fs.readdirSync(productionEvidenceRootPath, { withFileTypes: true });
+  return entries.some((e) => e.isDirectory() && e.name.endsWith(`-${tag}`) && fs.existsSync(path.join(productionEvidenceRootPath, e.name, 'summary.md')));
+}
+
 function hasOk(payload, pattern) {
   if (!payload || !Array.isArray(payload.items)) return false;
   return payload.items.some((x) => x.ok === true && typeof x.cmd === 'string' && x.cmd.includes(pattern));
@@ -84,23 +91,25 @@ const phaseDone = {
     gates.contracts &&
     routes.includes('webhook_receipts') &&
     routes.includes('payment.callback_replay') &&
-    smokeIdpay.includes('replayed=true'),
+    smokeIdpay.includes('replayed=true') &&
+    hasProductionEvidenceTag('phase-a'),
   B:
     gates.docs &&
     fs.existsSync(dbBackupPath) &&
     fs.existsSync(dbRestorePath) &&
     packageJson.includes('"db:backup"') &&
-    packageJson.includes('"db:restore"'),
+    packageJson.includes('"db:restore"') &&
+    hasProductionEvidenceTag('phase-b'),
   C:
     gates.docs &&
     server.includes('X-Content-Type-Options') &&
     server.includes('X-Frame-Options') &&
     server.includes('Referrer-Policy') &&
     server.includes('Permissions-Policy'),
-  D: false,
-  E: false,
-  F: gates.perf,
-  G: gates.contracts && gates.localFirst && gates.docs,
+  D: gates.docs && gates.contracts && gates.perf && hasProductionEvidenceTag('phase-d'),
+  E: gates.docs && gates.build && gates.smokeAll && hasProductionEvidenceTag('phase-e'),
+  F: gates.perf && gates.build && hasProductionEvidenceTag('phase-f'),
+  G: gates.contracts && gates.localFirst && gates.docs && hasProductionEvidenceTag('phase-g'),
 };
 
 const lines = [];
@@ -114,10 +123,12 @@ for (const m of phaseMatches) {
   const id = m[1];
   const title = m[2].trim();
   const status = Boolean(phaseDone[id] || false);
+  const implemented = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(id) ? status : false;
+  const validated = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(id) ? status : false;
   lines.push(`### Production Phase ${id} - ${title}`);
   lines.push(`- [${status ? 'x' : ' '}] Phase status`);
-  lines.push(`- [ ] Implement scope items for Phase ${id}`);
-  lines.push(`- [ ] Validate exit criteria for Phase ${id}`);
+  lines.push(`- [${implemented ? 'x' : ' '}] Implement scope items for Phase ${id}`);
+  lines.push(`- [${validated ? 'x' : ' '}] Validate exit criteria for Phase ${id}`);
   lines.push('');
 }
 

@@ -11,6 +11,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const payments_1 = require("./payments");
 const security_1 = require("./security");
+const normalize_1 = require("./normalize");
 function getAuthToken(req) {
     const h = String(req.headers.authorization || '');
     const m = h.match(/^Bearer\s+(.+)$/i);
@@ -204,11 +205,19 @@ function registerPublicRoutes(app, db, opts) {
         const body = req.body || {};
         if (!body.slug || !body.displayName)
             throw new http_1.ApiError('CREATOR_INVALID_REQUEST', 'slug/displayName required', 400);
+        const normalizedSlug = (0, normalize_1.normalizeCreatorSlug)(body.slug);
         try {
             const r = await db.pool.query(`INSERT INTO creators (user_id, slug, display_name, bio, social_links)
          VALUES ($1, $2, $3, $4, $5::jsonb)
-         RETURNING *`, [user.id, String(body.slug), String(body.displayName), String(body.bio || ''), JSON.stringify(body.socialLinks || {})]);
-            await (0, audit_1.auditEvent)(db, { actorUserId: user.id, action: 'creator.create', entityType: 'creator', entityId: r.rows[0].id, payload: { slug: body.slug }, traceId });
+         RETURNING *`, [user.id, normalizedSlug.slug, String(body.displayName), String(body.bio || ''), JSON.stringify(body.socialLinks || {})]);
+            await (0, audit_1.auditEvent)(db, {
+                actorUserId: user.id,
+                action: 'creator.create',
+                entityType: 'creator',
+                entityId: r.rows[0].id,
+                payload: { slug: normalizedSlug.slug, slugWarnings: normalizedSlug.warnings },
+                traceId,
+            });
             return r.rows[0];
         }
         catch (e) {
@@ -259,6 +268,7 @@ function registerPublicRoutes(app, db, opts) {
         const planId = String(body.planId || '');
         if (!planId)
             throw new http_1.ApiError('SUBSCRIPTION_INVALID_REQUEST', 'planId required', 400);
+        const returnUrl = (0, normalize_1.normalizeReturnUrl)(body.returnUrl);
         const idempotencyKey = req.headers['idempotency-key'] ? String(req.headers['idempotency-key']) : null;
         const created = await (0, payments_1.createSubscriptionCheckout)(db, {
             userId: user.id,
@@ -305,6 +315,7 @@ function registerPublicRoutes(app, db, opts) {
             paymentId: payment.id,
             gateway: checkout.gateway,
             redirectUrl: checkout.redirectUrl,
+            returnUrl,
         };
     });
     app.get('/api/v1/subscriptions/me', async (req) => {

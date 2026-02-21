@@ -1,0 +1,43 @@
+{
+  "schema": "asdev.membership.ops.summary.v1",
+  "generatedAt": "2026-02-21T10:00:00.000Z",
+  "window": {
+    "from": "2026-02-20T00:00:00.000Z",
+    "to": "2026-02-21T00:00:00.000Z"
+  },
+  "metrics": {
+    "activeSubscriptions": 128,
+    "pendingPayments": 6,
+    "failedPaymentsLast24h": 3,
+    "callbacksLast24h": 52,
+    "expiringNext7d": 19
+  },
+  "findings": [
+    {
+      "code": "PENDING_PAYMENTS_NOT_RECONCILED",
+      "severity": "MEDIUM",
+      "entity": {
+        "type": "PAYMENT"
+      },
+      "message": "چند پرداخت PENDING بیش از ۳۰ دقیقه است تعیین تکلیف نشده‌اند.",
+      "recommendation": "Job reconcile را فعال/افزایش بده و درگاه را دوباره query کن.",
+      "evidence": {
+        "count": 6
+      }
+    }
+  ],
+  "highlights": {
+    "topFixes": [
+      {
+        "code": "PENDING_PAYMENTS_NOT_RECONCILED",
+        "impact": "MEDIUM",
+        "effort": "LOW",
+        "why": "پول/اشتراک ممکن است گیر کند و پشتیبانی بالا می‌رود.",
+        "steps": [
+          "Job MEMBERSHIP_PAYMENT_RECONCILE را enqueue کن.",
+          "روی callback idempotency مطمئن باش."
+        ]
+      }
+    ]
+  }
+}

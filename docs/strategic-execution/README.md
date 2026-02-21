@@ -1,15 +1,14 @@
-# Strategic Execution - asdev-creator-membership-ir
+# Strategic Execution (Archived)
 
-This folder operationalizes ASDEV Strategic Execution Blueprint vlocal-fallback for this repository.
+This area is kept as an archive of one-time strategic rollout material.
 
-## Structure
-- blueprint-vlocal-fallback/: versioned blueprint snapshot
-- CURRENT_VERSION: active blueprint version
-- EXECUTION_BOARD.md: stage-gated board template
-- STAGE_STATUS.md: detected + manual stage status
-- runtime/: weekly reviews, evidence folders, and execution logs
+## Status
+- Active engineering source of truth has moved to:
+  - `docs/ROADMAP_PHASED.md`
+  - `docs/ROADMAP_PRODUCTION_PHASED.md`
+  - `docs/PROJECT_STATUS.md`
+  - `tasks/NEXT.md`
 
-## Runtime policy
-- No task is Done without evidence.
-- Every out-of-scope item must go through change request process.
-- Weekly review is required and stored in runtime/Weekly_Reviews/.
+## Archive Policy
+- Runtime evidence logs generated for past campaigns are removed from active docs.
+- Keep only high-level board/status files when needed for historical context.

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "bash -lc 'tsc -p tsconfig.json -w --preserveWatchOutput & node --watch dist/server.js'",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "worker:start": "node dist/worker.js",
+    "jobs:enqueue:ops": "node dist/jobs-enqueue-ops.js"
   },
   "dependencies": {
     "fastify": "^5.2.0",

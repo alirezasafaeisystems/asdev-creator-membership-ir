@@ -4,6 +4,7 @@ import { ApiError } from './http';
 import { applyPaymentResult, createPaymentGatewayAdapter } from './payments';
 import { auditEvent } from './audit';
 import { getUserBySession } from './auth';
+import { buildMembershipOpsSummary } from './opsSummary';
 
 export function registerAdminRoutes(app: FastifyInstance, db: Db, opts: {
   publicBaseUrl: string;
@@ -137,6 +138,16 @@ export function registerAdminRoutes(app: FastifyInstance, db: Db, opts: {
       payments: paymentByStatus,
       recentAudit: audits.rows,
     };
+  });
+
+  app.get('/api/v1/admin/ops/summary', async (req: any) => {
+    await requireAdminRole(req, ['platform_admin', 'support_admin', 'auditor']);
+    return buildMembershipOpsSummary(db, { rateLimitConfigured: true });
+  });
+
+  app.get('/api/admin/ops/summary', async (req: any) => {
+    await requireAdminRole(req, ['platform_admin', 'support_admin', 'auditor']);
+    return buildMembershipOpsSummary(db, { rateLimitConfigured: true });
   });
 
   // Reconcile pending payments through adapter and return structured report.
